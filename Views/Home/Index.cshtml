@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="btn-group-vertical" style="width: 100%; max-width: 400px; margin: 0 auto;">
+    <a href="@Url.Action("Recipes", "Home")" class="btn btn-primary btn-lg btn-block">Przeglądaj wszystkie przepisy</a>
+    @if (User.Identity.IsAuthenticated)
+    {
+                        <a href="@Url.Action("Index", "UserIngredients")" class="btn btn-secondary btn-lg btn-block">Twoje składniki w domu</a>
+                        <a href="@Url.Action("AvailableRecipes", "Recipes")" class="btn btn-success btn-lg btn-block">Przepisy możliwe do przygotowania</a>
+                        <a href="@Url.Action("AffordableRecipes", "Recipes")" class="btn btn-warning btn-lg btn-block">Przepisy w ramach budżetu</a>
+                        <a href="@Url.Action("Create", "ShoppingList")" class="btn btn-info btn-lg btn-block">Generuj listę zakupów</a>
+    }
+    else
+    {
+                        <p>Aby uzyskać dostęp do pełnej funkcjonalności, zaloguj się.</p>
+    }
+<div class="text-center">
+
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

@@ -1,0 +1,29 @@
+﻿@model IEnumerable<AplikacjaKulinarna.Models.Recipe>
+@{
+    ViewData["Title"] = "Przepisy";
+}
+
+<h1>Lista Przepisów</h1>
+
+@if (!Model.Any())
+{
+                <p>Brak przepisów do wyświetlenia.</p>
+}
+else
+{
+                <div class="row">
+        @foreach (var recipe in Model)
+        {
+                                    <div class="col-md-4">
+                                        <div class="card mb-4 shadow-sm">
+                                            <div class="card-body">
+                                                <h5 class="card-title">@recipe.Name</h5>
+                                                <p class="card-text">@recipe.Description</p>
+                                                <a asp-controller="Recipes" asp-action="Details" asp-route-id="@recipe.Id" class="btn btn-primary">Pokaż szczegóły</a>
+                                            </div>
+                                        </div>
+                                    </div>
+        }
+                </div>
+}
+
