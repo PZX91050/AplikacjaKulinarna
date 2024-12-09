@@ -27,10 +27,91 @@ namespace AplikacjaKulinarna.Controllers
         // GET: Recipes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Recipes.ToListAsync());
+            var recipes = await _context.Recipes
+                .Include(r => r.Ingredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                .ToListAsync();
+
+            return View(recipes);
         }
 
+
+        // GET: Recipes/AvailableRecipes
+        public async Task<IActionResult> AvailableRecipes()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            // Pobierz składniki użytkownika
+            var userIngredients = await _context.UserIngredients
+                .Where(ui => ui.UserId == user.Id)
+                .ToDictionaryAsync(ui => ui.IngredientId, ui => ui.Quantity);
+
+            // Pobierz wszystkie przepisy i ich składniki
+            var recipes = await _context.Recipes
+                .Include(r => r.Ingredients)
+                .ToListAsync();
+
+            // Filtruj przepisy, które użytkownik może przygotować
+            var availableRecipes = recipes.Where(recipe =>
+                recipe.Ingredients.All(ri =>
+                    userIngredients.TryGetValue(ri.IngredientId, out var userQuantity) &&
+                    userQuantity >= ri.Quantity
+                )).ToList();
+
+            return View(availableRecipes);
+        }
+
+
+        // GET: Recipes/BudgetRecipes
+        public IActionResult BudgetRecipes()
+        {
+            return View(); // Formularz do wprowadzenia budżetu
+        }
+
+        // POST: Recipes/BudgetRecipes
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult BudgetRecipes(decimal budget)
+        {
+            // Przechowaj budżet w TempData jako string
+            TempData["Budget"] = budget.ToString();
+            return RedirectToAction(nameof(BudgetRecipesResults));
+        }
+
+        // GET: Recipes/BudgetRecipesResults
+        public async Task<IActionResult> BudgetRecipesResults()
+        {
+            // Pobierz budżet z TempData i skonwertuj go na decimal
+            if (!TempData.TryGetValue("Budget", out var budgetStr) || !decimal.TryParse(budgetStr as string, out var budget))
+            {
+                return RedirectToAction(nameof(BudgetRecipes)); // Jeśli brak budżetu, wróć do formularza
+            }
+
+            // Pobierz wszystkie przepisy wraz z ich składnikami
+            var recipes = await _context.Recipes
+                .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .ToListAsync();
+
+            // Filtruj przepisy w ramach budżetu
+            var filteredRecipes = recipes
+                .Where(r => r.TotalPrice <= budget)
+                .ToList();
+
+            // Przekaż budżet do widoku
+            ViewData["Budget"] = budget;
+            return View(filteredRecipes);
+        }
+
+        
+
         // GET: Recipes/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,7 +120,10 @@ namespace AplikacjaKulinarna.Controllers
             }
 
             var recipe = await _context.Recipes
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .Include(r => r.Ingredients)
+                    .ThenInclude(ri => ri.Ingredient)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
             if (recipe == null)
             {
                 return NotFound();
@@ -47,6 +131,7 @@ namespace AplikacjaKulinarna.Controllers
 
             return View(recipe);
         }
+
 
         // GET: Recipes/Create
         public IActionResult Create()

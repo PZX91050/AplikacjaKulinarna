@@ -1,0 +1,21 @@
+﻿@model IEnumerable<AplikacjaKulinarna.Models.Recipe>
+
+@{
+    ViewData["Title"] = "Available Recipes";
+}
+
+<h1>Available Recipes</h1>
+
+@if (!Model.Any())
+{
+        <p>You don't have enough ingredients to make any recipes.</p>
+}
+else
+{
+        <ul>
+        @foreach (var recipe in Model)
+        {
+                    <li>@recipe.Name</li>
+        }
+        </ul>
+}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Claims;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,9 +23,13 @@ namespace AplikacjaKulinarna.Controllers
         // GET: UserIngredients
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.UserIngredients.Include(u => u.Ingredient).Include(u => u.User);
-            return View(await applicationDbContext.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userIngredients = _context.UserIngredients
+                .Where(ui => ui.UserId == userId)
+                .Include(ui => ui.Ingredient);
+            return View(await userIngredients.ToListAsync());
         }
+
 
         // GET: UserIngredients/Details/5
         public async Task<IActionResult> Details(string id)
@@ -46,31 +51,56 @@ namespace AplikacjaKulinarna.Controllers
             return View(userIngredient);
         }
 
-        // GET: UserIngredients/Create
         public IActionResult Create()
         {
-            ViewData["IngredientId"] = new SelectList(_context.Ingredients, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["IngredientId"] = new SelectList(_context.Ingredients, "Id", "Name");
             return View();
         }
+
+
 
         // POST: UserIngredients/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,IngredientId,Quantity")] UserIngredient userIngredient)
+        public async Task<IActionResult> Create([Bind("IngredientId,Quantity")] UserIngredient userIngredient)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(userIngredient);
+
+
+            // Przypisz UserId aktualnie zalogowanego użytkownika
+            userIngredient.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            
+           
+            
+                // Sprawdź, czy użytkownik już posiada ten składnik
+                var existingUserIngredient = await _context.UserIngredients
+                    .FirstOrDefaultAsync(ui => ui.UserId == userIngredient.UserId && ui.IngredientId == userIngredient.IngredientId);
+
+                if (existingUserIngredient != null)
+                {
+                    // Jeśli składnik już istnieje, zaktualizuj ilość
+                    existingUserIngredient.Quantity += userIngredient.Quantity;
+                    _context.Update(existingUserIngredient);
+                }
+                else
+                {
+                    // Dodaj nowy składnik
+                    _context.Add(userIngredient);
+                }
+
+                // Zapisz zmiany w bazie danych
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
-            ViewData["IngredientId"] = new SelectList(_context.Ingredients, "Id", "Id", userIngredient.IngredientId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userIngredient.UserId);
+            
+
+            // Jeśli ModelState jest nieważny, ponownie załaduj dane do widoku
+            ViewData["IngredientId"] = new SelectList(_context.Ingredients, "Id", "Name", userIngredient.IngredientId);
             return View(userIngredient);
         }
+
+
 
         // GET: UserIngredients/Edit/5
         public async Task<IActionResult> Edit(string id)

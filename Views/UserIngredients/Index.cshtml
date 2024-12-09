@@ -1,47 +1,41 @@
 ﻿@model IEnumerable<AplikacjaKulinarna.Models.UserIngredient>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Moje Składniki";
 }
 
-<h1>Index</h1>
+<h1>@ViewData["Title"]</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Dodaj Nowy Składnik</a>
 </p>
-<table class="table">
+
+<table class="table table-striped">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Ingredient)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Quantity)
-            </th>
+            <th>Ingredient</th>
+            <th>Ilość</th>
+            <th>Jednostka</th>
+            <th>Cena</th>
+            <th>Categoria</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ingredient.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Quantity)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Ingredient.Name</td>
+                <td>@item.Quantity</td>
+                <td>@item.Ingredient.WeightUnit</td>
+                <td>@item.Ingredient.Price.ToString("C")</td>
+                <td>@item.Ingredient.Category</td>
+                <td>
+                    <a asp-action="Edit" asp-route-ingredientId="@item.IngredientId">Edytuj</a> |
+                    <a asp-action="Details" asp-route-ingredientId="@item.IngredientId">Szczegóły</a> |
+                    <a asp-action="Delete" asp-route-ingredientId="@item.IngredientId">Usuń</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

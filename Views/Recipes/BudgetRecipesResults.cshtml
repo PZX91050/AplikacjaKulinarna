@@ -1,0 +1,33 @@
+﻿@model IEnumerable<AplikacjaKulinarna.Models.Recipe>
+
+@{
+    ViewData["Title"] = "Recipes Within Budget";
+    decimal budget = ViewData["Budget"] != null ? (decimal)ViewData["Budget"] : 0;
+}
+
+<h1>Recipes Within Budget</h1>
+
+<p>Your budget: <strong>@budget.ToString("C")</strong></p>
+
+@if (!Model.Any())
+{
+    <p>No recipes found within your budget.</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var recipe in Model)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@recipe.Name</h5>
+                        <p class="card-text">@recipe.Description</p>
+                        <p><strong>Total Cost:</strong> @recipe.TotalPrice.ToString("C")</p>
+                        <a asp-controller="Recipes" asp-action="Details" asp-route-id="@recipe.Id" class="btn btn-primary">View Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

@@ -1,48 +1,34 @@
 ﻿@model AplikacjaKulinarna.Models.Recipe
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Szczegóły Przepisu";
 }
 
-<h1>Details</h1>
+<h1>@Model.Name</h1>
 
-<div>
-    <h4>Recipe</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IngredientsString)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IngredientsString)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PreparationInstructions)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PreparationInstructions)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImagePath)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImagePath)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+<p><strong>Opis:</strong> @Model.Description</p>
+
+<p><strong>Instrukcja przygotowania:</strong></p>
+<p>@Model.PreparationInstructions</p>
+
+<h3>Składniki:</h3>
+@if (Model.Ingredients.Any())
+{
+            <ul>
+        @foreach (var ingredient in Model.Ingredients)
+        {
+                            <li>
+                                <strong>@ingredient.Ingredient.Name</strong> - @ingredient.Quantity @ingredient.Unit
+                                (Cena: @ingredient.GetConvertedPrice().ToString("C"))
+                            </li>
+        }
+            </ul>
+}
+else
+{
+            <p>Brak składników dla tego przepisu.</p>
+}
+
+<p><strong>Łączny koszt:</strong> @Model.TotalPrice.ToString("C")</p>
+
+<a asp-controller="Home" asp-action="Recipes" class="btn btn-secondary">Powrót do listy przepisów</a> 

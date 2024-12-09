@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Znajdź przepisy mieszczące się w budżecie";
+}
+
+<h1>Znajdź przepisy mieszczące się w budżecie</h1>
+
+<form asp-action="BudgetRecipes" method="post">
+    <div class="form-group">
+        <label for="budget">Wprowadź budżet:</label>
+        <input type="number" class="form-control" id="budget" name="budget" step="0.01" min="0" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Find Recipes</button>
+</form>

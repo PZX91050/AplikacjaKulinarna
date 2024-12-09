@@ -265,3 +265,4 @@ C:\Users\Pablo\source\repos\AplikacjaKulinarna\AplikacjaKulinarna\bin\Debug\net8
 C:\Users\Pablo\source\repos\AplikacjaKulinarna\AplikacjaKulinarna\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Drawing.Common.dll
 C:\Users\Pablo\source\repos\AplikacjaKulinarna\AplikacjaKulinarna\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\Pablo\source\repos\AplikacjaKulinarna\AplikacjaKulinarna\bin\Debug\net8.0\runtimes\win\lib\net7.0\System.Windows.Extensions.dll
+C:\Users\Pablo\source\repos\AplikacjaKulinarna\AplikacjaKulinarna\obj\Debug\net8.0\AplikacjaKulinarna.sourcelink.json
