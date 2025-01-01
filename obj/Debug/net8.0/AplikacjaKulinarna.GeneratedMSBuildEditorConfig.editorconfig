@@ -82,6 +82,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVjaXBlSW5ncmVkaWVudHNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/Pablo/source/repos/AplikacjaKulinarna/AplikacjaKulinarna/Views/Recipes/AffordableRecipes.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVjaXBlc1xBZmZvcmRhYmxlUmVjaXBlcy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Pablo/source/repos/AplikacjaKulinarna/AplikacjaKulinarna/Views/Recipes/AffordableRecipesResults.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVjaXBlc1xBZmZvcmRhYmxlUmVjaXBlc1Jlc3VsdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/Pablo/source/repos/AplikacjaKulinarna/AplikacjaKulinarna/Views/Recipes/AvailableRecipes.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVjaXBlc1xBdmFpbGFibGVSZWNpcGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -112,6 +120,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/Pablo/source/repos/AplikacjaKulinarna/AplikacjaKulinarna/Views/Recipes/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVjaXBlc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/Pablo/source/repos/AplikacjaKulinarna/AplikacjaKulinarna/Views/Recipes/MissingIngredients.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUmVjaXBlc1xNaXNzaW5nSW5ncmVkaWVudHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/Pablo/source/repos/AplikacjaKulinarna/AplikacjaKulinarna/Views/Shared/Error.cshtml]

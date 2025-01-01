@@ -32,3 +32,6 @@ else
 <p><strong>Łączny koszt:</strong> @Model.TotalPrice.ToString("C")</p>
 
 <a asp-controller="Home" asp-action="Recipes" class="btn btn-secondary">Powrót do listy przepisów</a> 
+<a asp-controller="Recipes" asp-action="MissingIngredients" asp-route-recipeId="@Model.Id" class="btn btn-primary">
+    Sprawdź listę zakupów
+</a>

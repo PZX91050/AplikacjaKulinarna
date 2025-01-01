@@ -1,29 +1,36 @@
 ﻿@model IEnumerable<AplikacjaKulinarna.Models.Recipe>
+
 @{
-    ViewData["Title"] = "Przepisy";
+    ViewData["Title"] = "Lista Przepisów";
 }
 
 <h1>Lista Przepisów</h1>
 
+<form method="get" asp-controller="Home" asp-action="Recipes">
+    <div class="form-group">
+        <input type="text" name="search" class="form-control" placeholder="Wyszukaj przepisy..." value="@ViewData["SearchQuery"]" />
+        <button type="submit" class="btn btn-primary mt-2">Szukaj</button>
+    </div>
+</form>
+
 @if (!Model.Any())
 {
-                <p>Brak przepisów do wyświetlenia.</p>
+    <p>Brak przepisów do wyświetlenia.</p>
 }
 else
 {
-                <div class="row">
+    <div class="row">
         @foreach (var recipe in Model)
         {
-                                    <div class="col-md-4">
-                                        <div class="card mb-4 shadow-sm">
-                                            <div class="card-body">
-                                                <h5 class="card-title">@recipe.Name</h5>
-                                                <p class="card-text">@recipe.Description</p>
-                                                <a asp-controller="Recipes" asp-action="Details" asp-route-id="@recipe.Id" class="btn btn-primary">Pokaż szczegóły</a>
-                                            </div>
-                                        </div>
-                                    </div>
-        }
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@recipe.Name</h5>
+                        <p class="card-text">@recipe.Description</p>
+                        <a asp-controller="Recipes" asp-action="Details" asp-route-id="@recipe.Id" class="btn btn-primary">Pokaż szczegóły</a>
+                    </div>
                 </div>
+            </div>
+        }
+    </div>
 }
-

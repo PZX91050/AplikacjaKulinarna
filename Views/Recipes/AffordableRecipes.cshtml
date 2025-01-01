@@ -1,0 +1,29 @@
+﻿@{
+    ViewData["Title"] = "Affordable Recipes";
+    var userIngredients = ViewData["UserIngredients"] as List<AplikacjaKulinarna.Models.UserIngredient>;
+}
+
+<h1>Affordable Recipes</h1>
+
+<h3>Your Current Ingredients:</h3>
+@if (userIngredients != null && userIngredients.Any())
+{
+    <ul>
+        @foreach (var ingredient in userIngredients)
+        {
+            <li>@ingredient.Ingredient.Name - @ingredient.Quantity @ingredient.Ingredient.WeightUnit</li>
+        }
+    </ul>
+}
+else
+{
+    <p>You don't have any ingredients at home.</p>
+}
+
+<form asp-action="AffordableRecipes" method="post">
+    <div class="form-group">
+        <label for="budget">Enter Your Budget:</label>
+        <input type="number" class="form-control" id="budget" name="budget" step="0.01" min="0" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Find Recipes</button>
+</form>

@@ -8,14 +8,18 @@
 
 @if (!Model.Any())
 {
-        <p>You don't have enough ingredients to make any recipes.</p>
+    <p>You don't have enough ingredients to make any recipes.</p>
 }
 else
 {
-        <ul>
+    <ul>
         @foreach (var recipe in Model)
         {
-                    <li>@recipe.Name</li>
+            <li>
+                <a asp-controller="Recipes" asp-action="Details" asp-route-id="@recipe.Id">
+                    @recipe.Name
+                </a>
+            </li>
         }
-        </ul>
+    </ul>
 }

@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Affordable Recipes Results";
+    decimal budget = ViewData["Budget"] != null ? (decimal)ViewData["Budget"] : 0;
+    var results = ViewData["Results"] as IEnumerable<dynamic>; // Rzutowanie na dynamic
+}
+
+<h1>Affordable Recipes</h1>
+
+<p>Your budget: <strong>@budget.ToString("C")</strong></p>
+
+@if (!Model.Any())
+{
+    <p>No recipes found within your budget.</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            var recipe = item.Recipe;
+            var remainingPrice = item.RemainingPrice;
+
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    @if (!string.IsNullOrEmpty(recipe.ImagePath))
+                    {
+                        <img src="@recipe.ImagePath" class="card-img-top" alt="@recipe.Name" />
+                    }
+                    <div class="card-body">
+                        <h5 class="card-title">@recipe.Name</h5>
+                        <p class="card-text">@recipe.Description</p>
+                        <p><strong>Ogólna Cena:</strong> @recipe.TotalPrice.ToString("C")</p>
+                        <p><strong>Cena pozostałych produktów:</strong> @remainingPrice.ToString("C")</p>
+                        <a asp-controller="Recipes" asp-action="Details" asp-route-id="@recipe.Id" class="btn btn-primary">View Details</a>
+                        <a asp-controller="Recipes" asp-action="MissingIngredients" asp-route-recipeId="@recipe.Id" class="btn btn-secondary">Wyświetl brakujące składniki</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

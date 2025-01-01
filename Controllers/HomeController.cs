@@ -32,15 +32,24 @@ namespace AplikacjaKulinarna.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Recipes()
+        public async Task<IActionResult> Recipes(string? search)
         {
-            var recipes = await _context.Recipes
-                .Include(r => r.Ingredients) // Pobierz sk³adniki przepisów
-                .ThenInclude(ri => ri.Ingredient) // Pobierz szczegó³y sk³adników
+            var query = _context.Recipes.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(r => r.Name.Contains(search));
+                ViewData["SearchQuery"] = search;
+            }
+
+            var recipes = await query
+                .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
                 .ToListAsync();
 
             return View(recipes);
         }
+
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

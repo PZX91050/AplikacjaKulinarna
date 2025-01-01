@@ -1,35 +1,56 @@
 ﻿@model AplikacjaKulinarna.Models.UserIngredient
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edytuj Składnik";
 }
 
-<h1>Edit</h1>
+<h1>@ViewData["Title"]</h1>
 
-<h4>UserIngredient</h4>
+<h4>Edytuj ilość składnika</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <!-- Ukryte pola -->
             <input type="hidden" asp-for="UserId" />
             <input type="hidden" asp-for="IngredientId" />
+
+            <!-- Pole do edycji ilości -->
             <div class="form-group">
-                <label asp-for="Quantity" class="control-label"></label>
+                <label asp-for="Quantity" class="control-label">Ilość</label>
                 <input asp-for="Quantity" class="form-control" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>
+
+            <!-- Pole nazwy składnika (tylko do odczytu) -->
+            @if (Model.Ingredient != null)
+            {
+                    <div class="form-group">
+                        <label class="control-label">Składnik</label>
+                        <input class="form-control" value="@Model.Ingredient.Name" readonly />
+                    </div>
+            }
+            else
+            {
+                    <div class="form-group">
+                        <label class="control-label">Składnik</label>
+                        <input class="form-control" value="Brak danych" readonly />
+                    </div>
+            }
+
+            <!-- Przyciski -->
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Zapisz" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

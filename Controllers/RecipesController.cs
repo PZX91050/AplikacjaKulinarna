@@ -108,7 +108,105 @@ namespace AplikacjaKulinarna.Controllers
             return View(filteredRecipes);
         }
 
-        
+        // GET: Recipes/AffordableRecipes
+        public async Task<IActionResult> AffordableRecipes()
+        {
+            // Pobierz składniki użytkownika
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var userIngredients = await _context.UserIngredients
+                .Where(ui => ui.UserId == user.Id)
+                .Include(ui => ui.Ingredient)
+                .ToListAsync();
+
+            ViewData["UserIngredients"] = userIngredients;
+            return View(); // Wyświetl formularz do podania budżetu
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AffordableRecipes(decimal budget)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var userIngredients = await _context.UserIngredients
+                .Where(ui => ui.UserId == user.Id)
+                .Include(ui => ui.Ingredient)
+                .ToListAsync();
+
+            var recipes = await _context.Recipes
+                .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .ToListAsync();
+
+            var results = recipes.Select(recipe =>
+            {
+                var missingIngredients = recipe.Ingredients
+                    .Where(ri => !userIngredients.Any(ui => ui.IngredientId == ri.IngredientId))
+                    .Select(ri => new
+                    {
+                        ri.Ingredient.Name,
+                        ri.Quantity,
+                        ri.Unit,
+                        ri.Ingredient.Price
+                    })
+                    .ToList();
+
+                var missingCost = missingIngredients.Sum(mi => mi.Price * (mi.Quantity / 1)); // Uwzględnij cenę i ilość
+
+                return new
+                {
+                    Recipe = recipe,
+                    RemainingPrice = missingCost,
+                    MissingIngredients = missingIngredients
+                };
+            })
+            .Where(r => r.RemainingPrice <= budget)
+            .ToList();
+
+            ViewData["Budget"] = budget;
+            ViewData["Results"] = results;
+
+            return View("AffordableRecipesResults");
+        }
+
+
+
+
+        public async Task<IActionResult> MissingIngredients(int recipeId)
+        {
+            var recipe = await _context.Recipes
+                .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .FirstOrDefaultAsync(r => r.Id == recipeId);
+
+            if (recipe == null) return NotFound();
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+
+            var userIngredients = await _context.UserIngredients
+                .Where(ui => ui.UserId == user.Id)
+                .ToDictionaryAsync(ui => ui.IngredientId, ui => ui.Quantity);
+
+            var missingIngredients = recipe.Ingredients
+                .Where(ri => !userIngredients.ContainsKey(ri.IngredientId) || userIngredients[ri.IngredientId] < ri.Quantity)
+                .Select(ri => new MissingIngredientViewModel
+                {
+                    Name = ri.Ingredient.Name,
+                    NeededQuantity = ri.Quantity,
+                    Unit = ri.Unit,
+                    OwnedQuantity = userIngredients.TryGetValue(ri.IngredientId, out var qty) ? qty : 0
+                })
+                .ToList();
+
+            return View(missingIngredients);
+        }
+
+
+
 
         // GET: Recipes/Details/5
         [AllowAnonymous]

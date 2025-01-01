@@ -1,0 +1,38 @@
+﻿@model IEnumerable<AplikacjaKulinarna.Models.MissingIngredientViewModel>
+
+@{
+    ViewData["Title"] = "Missing Ingredients";
+}
+
+<h1>Brakujące składniki</h1>
+
+@if (!Model.Any())
+{
+    <p>Nie brakuje składników do tego przepisu!</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Składnik</th>
+                <th>Potrzebna ilość</th>
+                <th>Posiadana ilość</th>
+                <th>Jednostka</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ingredient in Model)
+            {
+                <tr>
+                    <td>@ingredient.Name</td>
+                    <td>@ingredient.NeededQuantity</td>
+                    <td>@ingredient.OwnedQuantity</td>
+                    <td>@ingredient.Unit</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-controller="Recipes" asp-action="Details" asp-route-id="@ViewBag.RecipeId" class="btn btn-secondary">Powrót</a>
