@@ -8,14 +8,14 @@
 
 <p>Your budget: <strong>@budget.ToString("C")</strong></p>
 
-@if (!Model.Any())
+@if (results == null || !results.Any())
 {
     <p>No recipes found within your budget.</p>
 }
 else
 {
     <div class="row">
-        @foreach (var item in Model)
+        @foreach (var item in results)
         {
             var recipe = item.Recipe;
             var remainingPrice = item.RemainingPrice;

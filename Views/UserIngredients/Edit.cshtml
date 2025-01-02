@@ -1,56 +1,24 @@
 ﻿@model AplikacjaKulinarna.Models.UserIngredient
 
 @{
-    ViewData["Title"] = "Edytuj Składnik";
+    ViewData["Title"] = "Edit Ingredient";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h2>Edit Ingredient</h2>
 
-<h4>Edytuj ilość składnika</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<!-- Tutaj dodaj walidację modelu -->
+<div asp-validation-summary="All" class="text-danger"></div>
 
-            <!-- Ukryte pola -->
-            <input type="hidden" asp-for="UserId" />
-            <input type="hidden" asp-for="IngredientId" />
-
-            <!-- Pole do edycji ilości -->
-            <div class="form-group">
-                <label asp-for="Quantity" class="control-label">Ilość</label>
-                <input asp-for="Quantity" class="form-control" />
-                <span asp-validation-for="Quantity" class="text-danger"></span>
-            </div>
-
-            <!-- Pole nazwy składnika (tylko do odczytu) -->
-            @if (Model.Ingredient != null)
-            {
-                    <div class="form-group">
-                        <label class="control-label">Składnik</label>
-                        <input class="form-control" value="@Model.Ingredient.Name" readonly />
-                    </div>
-            }
-            else
-            {
-                    <div class="form-group">
-                        <label class="control-label">Składnik</label>
-                        <input class="form-control" value="Brak danych" readonly />
-                    </div>
-            }
-
-            <!-- Przyciski -->
-            <div class="form-group">
-                <input type="submit" value="Zapisz" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
-            </div>
-        </form>
+<form asp-action="Edit" method="post">
+    <input asp-for="IngredientId" type="hidden" />
+    <div class="form-group">
+        <label asp-for="Quantity" class="control-label"></label>
+        <input asp-for="Quantity" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
     </div>
-</div>
+    <div class="form-group">
+        <input type="submit" value="Save Changes" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}

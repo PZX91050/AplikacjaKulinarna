@@ -1,31 +1,44 @@
 ﻿using System.Security.Claims;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using AplikacjaKulinarna.Data;
 using AplikacjaKulinarna.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AplikacjaKulinarna.Controllers
 {
+    [Authorize]
     public class UserIngredientsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<User> _userManager;
 
-        public UserIngredientsController(ApplicationDbContext context)
+        public UserIngredientsController(ApplicationDbContext context, UserManager<User> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: UserIngredients
         public async Task<IActionResult> Index()
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userIngredients = _context.UserIngredients
-                .Where(ui => ui.UserId == userId)
-                .Include(ui => ui.Ingredient);
-            return View(await userIngredients.ToListAsync());
+            try
+            {
+                var userId = _userManager.GetUserId(User);
+                var userIngredients = _context.UserIngredients
+                    .Where(ui => ui.UserId == userId)
+                    .Include(ui => ui.Ingredient);
+                return View(await userIngredients.ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading ingredients: {ex.Message}");
+                throw;
+            }
         }
 
         // GET: UserIngredients/Details/5
@@ -36,7 +49,7 @@ namespace AplikacjaKulinarna.Controllers
                 return NotFound();
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _userManager.GetUserId(User);
             var userIngredient = await _context.UserIngredients
                 .Include(ui => ui.Ingredient)
                 .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
@@ -61,7 +74,8 @@ namespace AplikacjaKulinarna.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IngredientId,Quantity")] UserIngredient userIngredient)
         {
-            userIngredient.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _userManager.GetUserId(User);
+            userIngredient.UserId = userId;
 
             var existingUserIngredient = await _context.UserIngredients
                 .FirstOrDefaultAsync(ui => ui.UserId == userIngredient.UserId && ui.IngredientId == userIngredient.IngredientId);
@@ -80,15 +94,15 @@ namespace AplikacjaKulinarna.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: UserIngredients/Edit/5
-        public async Task<IActionResult> Edit(int? ingredientId)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int ingredientId)
         {
-            if (ingredientId == null)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
             {
-                return NotFound();
+                return Unauthorized();
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var userIngredient = await _context.UserIngredients
                 .Include(ui => ui.Ingredient)
                 .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
@@ -103,52 +117,50 @@ namespace AplikacjaKulinarna.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int ingredientId, [Bind("UserId,IngredientId,Quantity")] UserIngredient userIngredient)
+        public async Task<IActionResult> Edit(int ingredientId, decimal quantity)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            // Loguj dane wejściowe
-            Console.WriteLine($"Edit POST: IngredientId={ingredientId}, UserId={userId}, Quantity={userIngredient.Quantity}");
-
-            if (ingredientId != userIngredient.IngredientId || userId != userIngredient.UserId)
+            if (string.IsNullOrEmpty(userId))
             {
-                Console.WriteLine("Mismatch in IngredientId or UserId");
+                return Unauthorized();
+            }
+
+            if (quantity <= 0)
+            {
+                ModelState.AddModelError("Quantity", "Ilość musi być większa niż 0.");
+                var userIngredient = await _context.UserIngredients
+                    .Include(ui => ui.Ingredient)
+                    .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
+                return View(userIngredient);
+            }
+
+            var existingUserIngredient = await _context.UserIngredients
+                .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
+
+            if (existingUserIngredient == null)
+            {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                existingUserIngredient.Quantity = quantity;
+                _context.Update(existingUserIngredient);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.UserIngredients.Any(ui => ui.UserId == userId && ui.IngredientId == ingredientId))
                 {
-                    // Pobierz istniejący rekord
-                    var existingUserIngredient = await _context.UserIngredients
-                        .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
-
-                    if (existingUserIngredient == null)
-                    {
-                        Console.WriteLine("UserIngredient not found in database");
-                        return NotFound();
-                    }
-
-                    // Aktualizuj ilość
-                    existingUserIngredient.Quantity = userIngredient.Quantity;
-
-                    // Zapisz zmiany
-                    _context.Update(existingUserIngredient);
-                    await _context.SaveChangesAsync();
-
-                    Console.WriteLine("Changes saved to database successfully.");
-                    return RedirectToAction(nameof(Index));
+                    return NotFound();
                 }
-                catch (Exception ex)
+                else
                 {
-                    Console.WriteLine($"Error while saving changes: {ex.Message}");
                     throw;
                 }
             }
 
-            Console.WriteLine("ModelState is invalid.");
-            return View(userIngredient);
+            return RedirectToAction(nameof(Index));
         }
 
 
@@ -160,7 +172,7 @@ namespace AplikacjaKulinarna.Controllers
                 return NotFound();
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _userManager.GetUserId(User);
             var userIngredient = await _context.UserIngredients
                 .Include(ui => ui.Ingredient)
                 .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
@@ -178,7 +190,7 @@ namespace AplikacjaKulinarna.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int ingredientId)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = _userManager.GetUserId(User);
             var userIngredient = await _context.UserIngredients
                 .FirstOrDefaultAsync(ui => ui.UserId == userId && ui.IngredientId == ingredientId);
 

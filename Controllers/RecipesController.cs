@@ -111,7 +111,6 @@ namespace AplikacjaKulinarna.Controllers
         // GET: Recipes/AffordableRecipes
         public async Task<IActionResult> AffordableRecipes()
         {
-            // Pobierz składniki użytkownika
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
@@ -154,7 +153,7 @@ namespace AplikacjaKulinarna.Controllers
                     })
                     .ToList();
 
-                var missingCost = missingIngredients.Sum(mi => mi.Price * (mi.Quantity / 1)); // Uwzględnij cenę i ilość
+                var missingCost = missingIngredients.Sum(mi => mi.Price * mi.Quantity);
 
                 return new
                 {
