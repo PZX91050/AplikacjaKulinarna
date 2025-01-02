@@ -172,7 +172,7 @@ namespace AplikacjaKulinarna.Controllers
         }
 
 
-
+        [Authorize]
 
         public async Task<IActionResult> MissingIngredients(int recipeId)
         {
@@ -200,6 +200,8 @@ namespace AplikacjaKulinarna.Controllers
                     OwnedQuantity = userIngredients.TryGetValue(ri.IngredientId, out var qty) ? qty : 0
                 })
                 .ToList();
+            
+            ViewBag.RecipeId = recipeId;
 
             return View(missingIngredients);
         }
