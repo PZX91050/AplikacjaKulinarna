@@ -13,11 +13,11 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Ingredient</th>
-            <th>Ilość</th>
-            <th>Jednostka</th>
-            <th>Cena</th>
-            <th>Categoria</th>
+            <th>Składnik</th>
+            <th>Ilość w gramach </th>
+            <th>Cena za</th>
+            <th>Jednostkę</th>
+            <th>Kategoria</th>
             <th></th>
         </tr>
     </thead>
@@ -27,8 +27,8 @@
             <tr>
                 <td>@item.Ingredient.Name</td>
                 <td>@item.Quantity</td>
-                <td>@item.Ingredient.WeightUnit</td>
                 <td>@item.Ingredient.Price.ToString("C")</td>
+                <td>@item.Ingredient.WeightUnit</td>
                 <td>@item.Ingredient.Category</td>
                 <td>
                     <a asp-action="Edit" asp-route-ingredientId="@item.IngredientId">Edytuj</a> |

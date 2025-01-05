@@ -26,7 +26,7 @@ namespace AplikacjaKulinarna.Controllers
             return View(await applicationDbContext.ToListAsync());
         }
 
-        // GET: RecipeIngredients/Details/5
+        // GET: RecipeIngredients/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)

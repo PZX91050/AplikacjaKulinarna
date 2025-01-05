@@ -4,13 +4,13 @@
     var results = ViewData["Results"] as IEnumerable<dynamic>; // Rzutowanie na dynamic
 }
 
-<h1>Affordable Recipes</h1>
+<h1>Przepisy w ramach budżetu</h1>
 
 <p>Your budget: <strong>@budget.ToString("C")</strong></p>
 
 @if (results == null || !results.Any())
 {
-    <p>No recipes found within your budget.</p>
+    <p>Nie znaleziono żadnych przepisów.</p>
 }
 else
 {

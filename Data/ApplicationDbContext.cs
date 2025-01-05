@@ -11,8 +11,6 @@ namespace AplikacjaKulinarna.Data
         public DbSet<Ingredient> Ingredients { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<RecipeIngredient> RecipeIngredients { get; set; }
-        public DbSet<ShoppingList> ShoppingLists { get; set; }
-        public DbSet<ShoppingListItem> ShoppingListItems { get; set; }
         public DbSet<UserIngredient> UserIngredients { get; set; }
 
 
@@ -31,11 +29,7 @@ namespace AplikacjaKulinarna.Data
             modelBuilder.Entity<Ingredient>()
                 .Property(i => i.Price)
                 .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<ShoppingList>()
-                .Property(s => s.TotalCost)
-                .HasColumnType("decimal(18,2)");
-
+           
             modelBuilder.Entity<User>()
                 .Property(u => u.Budget)
                 .HasPrecision(18, 2);
@@ -74,22 +68,7 @@ namespace AplikacjaKulinarna.Data
                 .Property(ri => ri.Quantity)
                 .HasPrecision(10, 2);
 
-            modelBuilder.Entity<ShoppingListItem>()
-                .HasKey(sli => new { sli.ShoppingListId, sli.IngredientId });
-
-            modelBuilder.Entity<ShoppingListItem>()
-                .HasOne(sli => sli.ShoppingList)
-                .WithMany(sl => sl.ShoppingListItems)
-                .HasForeignKey(sli => sli.ShoppingListId);
-
-            modelBuilder.Entity<ShoppingListItem>()
-                .HasOne(sli => sli.Ingredient)
-                .WithMany()
-                .HasForeignKey(sli => sli.IngredientId);
-
-            modelBuilder.Entity<ShoppingListItem>()
-                .Property(sl => sl.Quantity)
-                .HasPrecision(10, 2);
+            
         }
     }
 }

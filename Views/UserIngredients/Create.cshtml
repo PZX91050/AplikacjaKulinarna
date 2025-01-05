@@ -4,23 +4,23 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
+<h1>Dodaj produkt do swojego magazynu</h1>
 
-<h4>UserIngredient</h4>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="IngredientId" class="control-label"></label>
+                <label class="control-label">Składnik</label>
                 <select asp-for="IngredientId" class="form-control" asp-items="ViewBag.IngredientId">
                     <option value="">-- Wybierz Składnik --</option>
                 </select>
                 <span asp-validation-for="IngredientId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Quantity" class="control-label"></label>
+                <label class="control-label">Ilość w gramach</label>
                 <input asp-for="Quantity" class="form-control" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
             </div>

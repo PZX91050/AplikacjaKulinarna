@@ -1,53 +1,114 @@
-﻿@model AplikacjaKulinarna.Models.Recipe
+﻿@model AplikacjaKulinarna.Models.RecipeCreateViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewBag.Title = "Create Recipe";
 }
 
-<h1>Create</h1>
+<h2>Utwórz nowy przepis</h2>
 
-<h4>Recipe</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="IngredientsString" class="control-label"></label>
-                <input asp-for="IngredientsString" class="form-control" />
-                <span asp-validation-for="IngredientsString" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PreparationInstructions" class="control-label"></label>
-                <input asp-for="PreparationInstructions" class="form-control" />
-                <span asp-validation-for="PreparationInstructions" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImagePath" class="control-label"></label>
-                <input asp-for="ImagePath" class="form-control" />
-                <span asp-validation-for="ImagePath" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@using (Html.BeginForm("Create", "Recipe", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <!-- Id - jeśli chcesz wyświetlać/edytować (opcjonalnie) -->
+    @Html.HiddenFor(m => m.Recipe.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Recipe.Name, "Nazwa przepisu")
+        @Html.TextBoxFor(m => m.Recipe.Name, new { @class = "form-control" })
     </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Recipe.Description, "Opis")
+        @Html.TextAreaFor(m => m.Recipe.Description,
+                new { @class = "form-control", rows = 3 })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Recipe.IngredientsString, "IngredientsString (opcjonalne)")
+        @Html.TextBoxFor(m => m.Recipe.IngredientsString, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Recipe.PreparationInstructions, "Instrukcje przygotowania")
+        @Html.TextAreaFor(m => m.Recipe.PreparationInstructions,
+                new { @class = "form-control", rows = 5 })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Recipe.ImagePath, "Ścieżka do obrazu (opcjonalne)")
+        @Html.TextBoxFor(m => m.Recipe.ImagePath, new { @class = "form-control" })
+    </div>
+
+    <hr />
+
+    <h4>Składniki:</h4>
+    <div id="ingredients-section">
+        <div class="form-inline">
+            <label>Wybierz składnik: </label>
+            <select id="ingredientSelect" class="form-control">
+                @foreach (var item in Model.Ingredients)
+                {
+                    <option value="@item.Value">@item.Text</option>
+                }
+            </select>
+
+            <label>Ilość: </label>
+            <input type="text" id="quantityInput" class="form-control"
+                   style="width:80px; margin-right:10px;" />
+
+            <button type="button" class="btn btn-primary" onclick="addIngredient()">
+                Dodaj składnik
+            </button>
+        </div>
+
+        <br />
+
+        <!-- Tu wyświetlimy listę wybranych składników -->
+        <ul id="selectedIngredients" style="list-style-type: none; padding: 0;">
+            <!-- Zapełni się dynamicznie w JS -->
+        </ul>
+    </div>
+
+    <!-- Ukryte pola do przechowywania ID składników oraz ilości -->
+    @Html.HiddenFor(m => m.IngredientIds, new { id = "ingredientIds" })
+    @Html.HiddenFor(m => m.Quantities, new { id = "quantities" })
+
+    <hr />
+
+    <input type="submit" value="Zapisz przepis" class="btn btn-success" />
+}
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function addIngredient() {
+            var ingredientSelect = document.getElementById('ingredientSelect');
+            var selectedIngredientId = ingredientSelect.value;
+            var selectedIngredientName = ingredientSelect.options[ingredientSelect.selectedIndex].text;
+            var quantityInput = document.getElementById('quantityInput').value;
+
+            if (!quantityInput) {
+                alert("Podaj ilość składnika!");
+                return;
+            }
+
+            // Dodajemy do listy wyświetlanej w widoku (ul)
+            var li = document.createElement('li');
+            li.textContent = selectedIngredientName + " - " + quantityInput;
+            document.getElementById('selectedIngredients').appendChild(li);
+
+            // Doklejamy wartości do hidden fields
+            var ingredientIdsField = document.getElementById('ingredientIds');
+            var quantitiesField = document.getElementById('quantities');
+
+            if (ingredientIdsField.value) {
+                ingredientIdsField.value += "," + selectedIngredientId;
+                quantitiesField.value += "," + quantityInput;
+            } else {
+                ingredientIdsField.value = selectedIngredientId;
+                quantitiesField.value = quantityInput;
+            }
+
+            // Czyścimy pole ilości
+            document.getElementById('quantityInput').value = "";
+        }
+    </script>
 }

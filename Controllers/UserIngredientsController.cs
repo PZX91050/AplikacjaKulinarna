@@ -163,8 +163,9 @@ namespace AplikacjaKulinarna.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
+        
         // GET: UserIngredients/Delete/5
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? ingredientId)
         {
             if (ingredientId == null)
@@ -185,7 +186,8 @@ namespace AplikacjaKulinarna.Controllers
             return View(userIngredient);
         }
 
-        // POST: UserIngredients/Delete/5
+        // POST: UserIngredients/Delete
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int ingredientId)

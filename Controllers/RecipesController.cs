@@ -101,6 +101,7 @@ namespace AplikacjaKulinarna.Controllers
             // Filtruj przepisy w ramach budżetu
             var filteredRecipes = recipes
                 .Where(r => r.TotalPrice <= budget)
+                .OrderBy(r => r.TotalPrice)
                 .ToList();
 
             // Przekaż budżet do widoku
@@ -130,30 +131,35 @@ namespace AplikacjaKulinarna.Controllers
             var user = await _userManager.GetUserAsync(User);
             if (user == null) return Unauthorized();
 
+            // Pobierz składniki użytkownika
             var userIngredients = await _context.UserIngredients
                 .Where(ui => ui.UserId == user.Id)
                 .Include(ui => ui.Ingredient)
                 .ToListAsync();
 
+            // Pobierz przepisy z powiązanymi składnikami
             var recipes = await _context.Recipes
                 .Include(r => r.Ingredients)
                 .ThenInclude(ri => ri.Ingredient)
                 .ToListAsync();
 
+            // Oblicz brakujące składniki i ich koszt
             var results = recipes.Select(recipe =>
             {
+                // Znajdź brakujące składniki
                 var missingIngredients = recipe.Ingredients
                     .Where(ri => !userIngredients.Any(ui => ui.IngredientId == ri.IngredientId))
                     .Select(ri => new
                     {
-                        ri.Ingredient.Name,
-                        ri.Quantity,
-                        ri.Unit,
-                        ri.Ingredient.Price
+                        IngredientName = ri.Ingredient.Name,
+                        QuantityNeeded = ri.Quantity,
+                        Unit = ri.Unit,
+                        MissingCost = ri.GetConvertedPrice() // Użycie metody GetConvertedPrice
                     })
                     .ToList();
 
-                var missingCost = missingIngredients.Sum(mi => mi.Price * mi.Quantity);
+                // Oblicz całkowity koszt brakujących składników
+                var missingCost = missingIngredients.Sum(mi => mi.MissingCost);
 
                 return new
                 {
@@ -162,9 +168,11 @@ namespace AplikacjaKulinarna.Controllers
                     MissingIngredients = missingIngredients
                 };
             })
-            .Where(r => r.RemainingPrice <= budget)
+            .Where(r => r.RemainingPrice <= budget) // Filtruj przepisy mieszczące się w budżecie
+            .OrderBy(r => r.RemainingPrice) // Sortowanie według RemainingPrice (rosnąco)
             .ToList();
 
+            // Przekaż dane do widoku
             ViewData["Budget"] = budget;
             ViewData["Results"] = results;
 
@@ -172,8 +180,8 @@ namespace AplikacjaKulinarna.Controllers
         }
 
 
-        [Authorize]
 
+        [Authorize]
         public async Task<IActionResult> MissingIngredients(int recipeId)
         {
             var recipe = await _context.Recipes
@@ -209,7 +217,7 @@ namespace AplikacjaKulinarna.Controllers
 
 
 
-        // GET: Recipes/Details/5
+        
         [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
@@ -232,28 +240,104 @@ namespace AplikacjaKulinarna.Controllers
         }
 
 
-        // GET: Recipes/Create
+
+        [HttpGet]
         public IActionResult Create()
         {
-            return View();
-        }
+            // 1. Pobierz listę składników z bazy, posortowaną alfabetycznie
+            var allIngredients = _context.Ingredients
+                                         .OrderBy(i => i.Name)
+                                         .ToList();
 
-        // POST: Recipes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,IngredientsString,PreparationInstructions,ImagePath")] Recipe recipe)
-        {
-            if (ModelState.IsValid)
+            // 2. Utwórz SelectListItem do dropdownu
+            var ingredientsSelectList = allIngredients
+                .Select(i => new SelectListItem
+                {
+                    Value = i.Id.ToString(),
+                    Text = i.Name
+                }).ToList();
+
+            // 3. Stwórz ViewModel
+            var viewModel = new RecipeCreateViewModel
             {
-                _context.Add(recipe);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(recipe);
+                Recipe = new Recipe(),
+                Ingredients = ingredientsSelectList
+            };
+
+           
+
+            return View(viewModel);
         }
 
+        [HttpPost]
+        public IActionResult Create(RecipeCreateViewModel model)
+        {
+            // Walidacja
+            if (!ModelState.IsValid)
+            {
+                // Jeśli np. wystąpi błąd walidacji, musimy ponownie załadować listę do dropdownu
+                var allIngredients = _context.Ingredients.OrderBy(i => i.Name).ToList();
+                model.Ingredients = allIngredients.Select(i => new SelectListItem
+                {
+                    Value = i.Id.ToString(),
+                    Text = i.Name
+                }).ToList();
+
+                return View(model);
+            }
+
+            // Stworzenie obiektu Recipe z polami z formularza
+            var recipe = new Recipe
+            {
+                // Jeżeli naprawdę chcesz ustawić ID samodzielnie (opcjonalnie) 
+                // Id = model.Recipe.Id,
+
+                Name = model.Recipe.Name,
+                Description = model.Recipe.Description,
+                IngredientsString = model.Recipe.IngredientsString,
+                PreparationInstructions = model.Recipe.PreparationInstructions,
+                ImagePath = model.Recipe.ImagePath
+            };
+
+            // Parsujemy ID składników i ilości z hidden fields
+            if (!string.IsNullOrEmpty(model.IngredientIds) && !string.IsNullOrEmpty(model.Quantities))
+            {
+                var ingredientIds = model.IngredientIds.Split(',');
+                var quantities = model.Quantities.Split(',');
+
+                for (int i = 0; i < ingredientIds.Length; i++)
+                {
+                    if (int.TryParse(ingredientIds[i], out int ingId)
+                        && decimal.TryParse(quantities[i], out decimal qty))
+                    {
+                        // Tworzymy RecipeIngredient
+                        var recipeIngredient = new RecipeIngredient
+                        {
+                            IngredientId = ingId,
+                            Quantity = qty,
+                            // Jednostkę możesz też pobierać z frontu lub ustawić dowolnie
+                            Unit = "gram"
+                        };
+
+                        // Dodaj do kolekcji
+                        if (recipe.Ingredients == null)
+                            recipe.Ingredients = new List<RecipeIngredient>();
+
+                        recipe.Ingredients.Add(recipeIngredient);
+                    }
+                }
+            }
+
+            // Zapis do bazy
+            _context.Recipes.Add(recipe);
+            _context.SaveChanges();
+
+            return RedirectToAction("Index");
+        }
+
+
+
+        [Authorize(Roles = "Admin")]
         // GET: Recipes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -273,6 +357,7 @@ namespace AplikacjaKulinarna.Controllers
         // POST: Recipes/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,IngredientsString,PreparationInstructions,ImagePath")] Recipe recipe)
@@ -305,7 +390,9 @@ namespace AplikacjaKulinarna.Controllers
             return View(recipe);
         }
 
-        // GET: Recipes/Delete/5
+
+        // GET: Recipes/Delete
+        [Authorize(Roles = "Admin")]        
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -323,7 +410,8 @@ namespace AplikacjaKulinarna.Controllers
             return View(recipe);
         }
 
-        // POST: Recipes/Delete/5
+        // POST: Recipes/Delete
+        [Authorize(Roles = "Admin")]       
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

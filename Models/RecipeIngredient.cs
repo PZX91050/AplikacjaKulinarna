@@ -25,7 +25,7 @@
                 "gram" => 1000m,
                 "kilogram" => 1m,
                 "ml" => 1000m,
-                "litr" => 1m,
+                "litr" => 1m,               
                 _ => 1m
             };
         }
