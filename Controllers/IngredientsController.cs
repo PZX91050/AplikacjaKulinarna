@@ -118,7 +118,7 @@ namespace AplikacjaKulinarna.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        // GET: Ingredients/Delete/5
+        // GET: Ingredients/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

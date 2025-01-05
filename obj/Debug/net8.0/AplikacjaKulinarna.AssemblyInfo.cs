@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AplikacjaKulinarna")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cb983e949862cbe4fec7da211379489859da5183")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+06696952610d75460e5a77672329418301c1f9a1")]
 [assembly: System.Reflection.AssemblyProductAttribute("AplikacjaKulinarna")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AplikacjaKulinarna")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

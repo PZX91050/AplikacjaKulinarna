@@ -70,7 +70,7 @@ namespace AplikacjaKulinarna.Controllers
         // GET: Recipes/BudgetRecipes
         public IActionResult BudgetRecipes()
         {
-            return View(); // Formularz do wprowadzenia budżetu
+            return View(); 
         }
 
         // POST: Recipes/BudgetRecipes
@@ -89,7 +89,7 @@ namespace AplikacjaKulinarna.Controllers
             // Pobierz budżet z TempData i skonwertuj go na decimal
             if (!TempData.TryGetValue("Budget", out var budgetStr) || !decimal.TryParse(budgetStr as string, out var budget))
             {
-                return RedirectToAction(nameof(BudgetRecipes)); // Jeśli brak budżetu, wróć do formularza
+                return RedirectToAction(nameof(BudgetRecipes)); 
             }
 
             // Pobierz wszystkie przepisy wraz z ich składnikami
@@ -121,7 +121,7 @@ namespace AplikacjaKulinarna.Controllers
                 .ToListAsync();
 
             ViewData["UserIngredients"] = userIngredients;
-            return View(); // Wyświetl formularz do podania budżetu
+            return View(); 
         }
 
         [HttpPost]
@@ -169,7 +169,7 @@ namespace AplikacjaKulinarna.Controllers
                 };
             })
             .Where(r => r.RemainingPrice <= budget) // Filtruj przepisy mieszczące się w budżecie
-            .OrderBy(r => r.RemainingPrice) // Sortowanie według RemainingPrice (rosnąco)
+            .OrderBy(r => r.RemainingPrice) 
             .ToList();
 
             // Przekaż dane do widoku
@@ -355,8 +355,6 @@ namespace AplikacjaKulinarna.Controllers
         }
 
         // POST: Recipes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]

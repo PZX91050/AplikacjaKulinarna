@@ -55,8 +55,6 @@ namespace AplikacjaKulinarna.Controllers
         }
 
         // POST: RecipeIngredients/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("RecipeId,IngredientId,Quantity,Unit")] RecipeIngredient recipeIngredient)
@@ -72,7 +70,7 @@ namespace AplikacjaKulinarna.Controllers
             return View(recipeIngredient);
         }
 
-        // GET: RecipeIngredients/Edit/5
+        // GET: RecipeIngredients/Edit
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,9 +88,7 @@ namespace AplikacjaKulinarna.Controllers
             return View(recipeIngredient);
         }
 
-        // POST: RecipeIngredients/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // POST: RecipeIngredients/Edit       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("RecipeId,IngredientId,Quantity,Unit")] RecipeIngredient recipeIngredient)
@@ -127,7 +123,7 @@ namespace AplikacjaKulinarna.Controllers
             return View(recipeIngredient);
         }
 
-        // GET: RecipeIngredients/Delete/5
+        // GET: RecipeIngredients/Delete
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -147,7 +143,7 @@ namespace AplikacjaKulinarna.Controllers
             return View(recipeIngredient);
         }
 
-        // POST: RecipeIngredients/Delete/5
+        // POST: RecipeIngredients/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

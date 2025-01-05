@@ -9,16 +9,16 @@ namespace AplikacjaKulinarna.Models
         public string UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public User User { get; set; } // Pole nawigacyjne, nieweryfikowane w ModelState
+        public User User { get; set; } 
 
         [Required]
         public int IngredientId { get; set; }
 
         [ForeignKey("IngredientId")]
-        public Ingredient Ingredient { get; set; } // Pole nawigacyjne, nieweryfikowane w ModelState
+        public Ingredient Ingredient { get; set; } 
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Ilość musi być większa niż 0.")]
-        public decimal Quantity { get; set; } // Ilość posiadanego składnika
+        public decimal Quantity { get; set; } 
     }
 }
