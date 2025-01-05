@@ -1,14 +1,36 @@
 ﻿<h2>Instrukcja</h2>
 <ol>
-    <li>Proszę uruchomić program, pojawi się strona startowa.</li>
     <li>
-        Następnie proszę odpalić w Solution Explorer (CTRL + SHIFT + ALT) -> Database -> baza.sql ->
-        klikamy zieloną strzałkę albo CTRL + SHIFT + E.
+        Po uruchomieniu programu baza danych powinna sama się utworzyć (przez skrypt z <strong>Program.cs</strong>) oraz automatycznie uzupełnić przy pomocy danych z pliku <strong>baza.sql</strong>.
     </li>
     <li>
-        Pojawi się okno Connect, wybieramy zakładkę Browse -> Local -> MSSQLLocalDB -> Klikamy Connect
-        (Opcje poniżej można zostawić niezmienione).
+        Jeśli baza danych nie została utworzona lub nie została uzupełniona danymi, proszę postępować według poniższych kroków:
+        <ol type="a">
+            <li>
+                Proszę uruchomić program, pojawi się strona startowa.
+            </li>
+            <li>
+                Następnie proszę otworzyć plik <strong>baza.sql</strong> w Solution Explorer:
+                <ul>
+                    <li>Przejdź do <strong>Solution Explorer</strong> (skrót klawiszowy: <strong>CTRL + SHIFT + ALT</strong>).</li>
+                    <li>Rozwiń folder <strong>Database</strong>.</li>
+                    <li>Kliknij prawym przyciskiem myszy na <strong>baza.sql</strong> i wybierz opcję <strong>Run</strong> lub użyj skrótu <strong>CTRL + SHIFT + E</strong>.</li>
+                </ul>
+            </li>
+            <li>
+                Pojawi się okno <strong>Connect</strong>, w którym należy:
+                <ul>
+                    <li>Wybrać zakładkę <strong>Browse</strong>.</li>
+                    <li>Następnie wybrać <strong>Local</strong> -> <strong>MSSQLLocalDB</strong>.</li>
+                    <li>Kliknąć przycisk <strong>Connect</strong> (opcje poniżej można zostawić niezmienione).</li>
+                </ul>
+            </li>
+            <li>
+                Po wykonaniu skryptu, proszę uruchomić ponownie aplikację. Wszystkie dane powinny być załadowane poprawnie.
+            </li>
+            <li>
+                Po zarejestrowaniu się (lokalna rejestracja), na stronie głównej pojawią się pozostałe kafelki z funkcjami aplikacji.
+            </li>
+        </ol>
     </li>
-    <li>Proszę uruchomić ponownie aplikację, wszystkie dane powinny być załadowane.</li>
-    <li>Po zarejestrowaniu się (lokalna rejestracja), na stronie głównej pojawi się pozostałe 5 kafelek z funkcjami.</li>
 </ol>
