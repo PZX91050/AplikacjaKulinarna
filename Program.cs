@@ -13,7 +13,7 @@ namespace AplikacjaKulinarna
     {
         public static void Main(string[] args)
         {
-            //  Najpierw sprawdzamy/ew. tworzymy bazê w LocalDB.
+            
             string dbName = "AplikacjaKulinarnaDb";
             string desiredCollation = "SQL_Latin1_General_CP1_CI_AS";
             string masterConnectionString = "Server=(localdb)\\MSSQLLocalDB;Database=master;Trusted_Connection=True;";
@@ -21,24 +21,20 @@ namespace AplikacjaKulinarna
             bool dbExists = DatabaseExists(dbName, masterConnectionString);
             if (!dbExists)
             {
-                Console.WriteLine($"Baza '{dbName}' nie istnieje. Tworzê now¹...");
+                Console.WriteLine($"Baza '{dbName}' nie istnieje. TworzÄ™ nowÄ…...");
                 CreateDatabase(dbName, desiredCollation, masterConnectionString);
-                Console.WriteLine($"Baza '{dbName}' zosta³a utworzona z collation '{desiredCollation}'.");
+                Console.WriteLine($"Baza '{dbName}' zostaÅ‚a utworzona z collation '{desiredCollation}'.");
             }
             else
             {
-                Console.WriteLine($"Baza '{dbName}' ju¿ istnieje.");
+                Console.WriteLine($"Baza '{dbName}' juÅ¼ istnieje.");
             }
 
             
             var builder = WebApplication.CreateBuilder(args);
-
-            // £adujemy connection string do naszej bazy.
-            
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
                 ?? $"Server=(localdb)\\MSSQLLocalDB;Database={dbName};Trusted_Connection=True;";
-
-            // #4. Dodajemy ApplicationDbContext z EF Core
+   
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -55,12 +51,10 @@ namespace AplikacjaKulinarna
             
             var app = builder.Build();
 
-            // Migracje EF Core.
-            // Tworzymy scope, aby dostaæ ApplicationDbContext.
+            
             using (var scope = app.Services.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                // Uruchamiamy migracje:
                 dbContext.Database.Migrate();
             }
 
@@ -68,9 +62,9 @@ namespace AplikacjaKulinarna
             string scriptPath = Path.Combine(AppContext.BaseDirectory, "Database", "baza.sql");
             if (File.Exists(scriptPath))
             {
-                Console.WriteLine($"Wykonujê skrypt SQL z pliku: {scriptPath}");
+                Console.WriteLine($"WykonujÄ™ skrypt SQL z pliku: {scriptPath}");
                 ExecuteSqlScript(connectionString, scriptPath);
-                Console.WriteLine("Skrypt baza.sql zosta³ pomyœlnie wykonany.");
+                Console.WriteLine("Skrypt baza.sql zostaÅ‚ pomyÅ›lnie wykonany.");
             }
             else
             {
@@ -98,14 +92,11 @@ namespace AplikacjaKulinarna
                 pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
 
-            // Startujemy serwer:
-            Console.WriteLine("Uruchamiam aplikacjê...");
+            Console.WriteLine("Uruchamiam aplikacjÄ™...");
             app.Run();
         }
 
-        /// <summary>
-        /// Sprawdza w bazie master, czy istnieje baza o podanej nazwie.
-        /// </summary>
+        
         private static bool DatabaseExists(string dbName, string masterConnectionString)
         {
             using var connection = new SqlConnection(masterConnectionString);
@@ -123,9 +114,7 @@ namespace AplikacjaKulinarna
             return (result != null);
         }
 
-        /// <summary>
-        /// Tworzy  bazê w LocalDB z podan¹ collation.
-        /// </summary>
+        
         private static void CreateDatabase(string dbName, string collation, string masterConnectionString)
         {
             using var connection = new SqlConnection(masterConnectionString);
